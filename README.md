@@ -11,6 +11,6 @@ Bot team skills for the Grok bot roster (chief of staff + per-repo PM / builder 
 
 ## `slow-wayfinder/`
 
-Personal overlay on stock `/wayfinder` (not a bot persona):
+Personal overlay on stock `/wayfinder`:
 
-- `slow-wayfinder`: Use with `/wayfinder` when charting or grilling with the owner: one question at a time, repo checkpoints, map-only charting, bot queues for research and build.
+- `slow-wayfinder`: Overlay on stock `/wayfinder` (needs `/wayfinder`, `/to-spec`, `/to-tickets`): one question at a time, repo checkpoints, and map-only charting.
