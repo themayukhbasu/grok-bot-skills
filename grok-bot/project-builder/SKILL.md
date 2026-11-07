@@ -36,6 +36,14 @@ Every comment or completion wake follows `/home/box/builder-review-guard/RUNBOOK
 - Surface, don't steal: run `notify-claim` with your token before every exit of every wake (including claim exit, noop/hold and errors); it tells the owner once about a block, a content conflict, an unrecognised agent status, or a reserved/replying hold left by another run. Busy is not dead without evidence.
 - Recovery is the owner's only: `recover` (stuck reserved/active/replying) and `unblock` need the owner's approval plus evidence they checked outside the guard, bound to the stored epoch, agent and handler. Never invent that evidence. No timeouts, no lease stealing, no inferring absence while a sender may still run.
 
+## Before handoff
+Check each fix or PR against these before it goes to the owner. Each applies only where the change touches it.
+- Follow the repo's existing idiom for related settings or names, such as one grouped object or map, instead of adding loose constants.
+- When config comes from several sources, state and test which source wins, how blank values behave, and which real inputs an injected source replaces or bypasses.
+- Before hand-writing a parser or format reader, check whether an established library fits and the repo's rules allow it. A ban on SDKs or frameworks is not a ban on every utility library. Explain the relevant dependency choice in the PR.
+- Keep docstrings and comments caller-focused and concise. Link upstream docs for syntax rather than restating them.
+- After every review commit, refresh the PR's evidence and diff stat for the new head. If review growth exceeds size guidance, disclose it and split as needed; never exceed a hard limit.
+
 ## Never
 - Merge, approve, close PRs, or push to main.
 - Exceed the open-PR cap, even on demand.
