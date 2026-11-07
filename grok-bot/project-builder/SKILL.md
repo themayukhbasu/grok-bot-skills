@@ -24,10 +24,17 @@ You turn one ticket into one PR, and fix review comments. You never merge, push 
 5. Read the PR back. Missing evidence or over the size limit: fix before reporting.
 6. Tell the PM the PR link in one line.
 
-## Review comments
-- Each comment wake: read all unresolved comments on that PR (not just the newest, so a run that died mid-way is caught up), fix them in one cloud-agent run on the same branch, reply under each comment with what changed and the evidence.
-- A comment that asks a question gets an answer, not a code change.
-- Disagree with a comment: reply with the reason and evidence, change nothing, leave it for the owner.
+## Review comments (guarded)
+Every comment or completion wake follows `/home/box/builder-review-guard/RUNBOOK.md` with `reviewguard.py` from that directory. The guard decides; your own lists, notes or conversation memory never do.
+- Guard required: if the helper or its DB is missing, errors, or returns anything not in the runbook, stop and tell the owner. Never fall back to an unguarded fix run.
+- One DB for all: every orchestration wake, in any run, uses the same absolute `REVIEWGUARD_DB`. One fresh token per run, reused for that run's calls.
+- Atomic claim: enqueue every unresolved comment (typed id, revision, body hash), then `claim`. Only a `launch` result may start a cloud agent. Seeing an agent in a list is not a claim.
+- Code-only agents: the fix agent gets the exact snapshot text it was claimed for, edits code on the PR branch, and returns proposed replies as JSON (`cid`, `hash`, `body`). It never posts on GitHub. Questions get an answer, not a code change. On disagreement it gives the reason and evidence and changes nothing.
+- Completion binding: `complete` with the agent id from the completion event itself, never one substituted from guard state. Only the single `handle` holder replies, and only for the exact claimed cid and hash. Extras or mismatches block. A failed agent sends nothing.
+- Replies: `reply-begin` before each post, then post once with its marker (inline thread for `review:`, PR conversation comment for `issue:` and `review-body:`), then `reply-done` only on a definite result. An ambiguous send means no retry: the PR blocks.
+- Missed completions: on a comment wake with the PR `active`, read the recorded agent's own status and complete it if terminal. Never add polling loops.
+- Surface, don't steal: run `notify-claim` with your token before every exit of every wake (including claim exit, noop/hold and errors); it tells the owner once about a block, a content conflict, an unrecognised agent status, or a reserved/replying hold left by another run. Busy is not dead without evidence.
+- Recovery is the owner's only: `recover` (stuck reserved/active/replying) and `unblock` need the owner's approval plus evidence they checked outside the guard, bound to the stored epoch, agent and handler. Never invent that evidence. No timeouts, no lease stealing, no inferring absence while a sender may still run.
 
 ## Never
 - Merge, approve, close PRs, or push to main.
